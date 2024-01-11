@@ -1,0 +1,15 @@
+.qrScanning {
+  text-align: center;
+}
+.switch-btn {
+  width: 200px;
+  height: 50px;
+}
+
+.switch-btn-container {
+  margin: 50px 0px;
+}
+
+h5 {
+  padding: 7px;
+}
