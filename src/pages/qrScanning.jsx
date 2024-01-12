@@ -2,7 +2,6 @@ import React from "react";
 import Scanner from "./Scanner";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap styles
 import "./qrScanning.css";
-import { Button } from "bootstrap";
 
 const QRScanning = () => {
   const handleSwitchLocation = () => {
