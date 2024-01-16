@@ -47,12 +47,15 @@ function Scanner({ onScanResultChange }) {
   const sendScannedDataToBackend = async (result) => {
     try {
       console.log(result);
-      const response = await fetch("http://localhost:3001/api/scanned-qr", {
+      const response = await fetch("http://localhost:4440/logsz/saveQRLog", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ scanResult: result }),
+        body: JSON.stringify({
+          id_num: parseInt(result),
+          scannerLocation_ID: 1,
+        }),
       });
 
       const data = await response.json();
