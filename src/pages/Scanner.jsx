@@ -6,6 +6,14 @@ import "./Scanner.css";
 function Scanner({ onScanResultChange }) {
   const [scanResult, setScanResult] = useState("");
   const [scanner, setScanner] = useState(null);
+  const [fullName, setFullName] = useState("");
+  const [qrError, setqrError] = useState("");
+  const now = new Date();
+
+  const hours = now.getHours();
+  const minutes = now.getMinutes().toString().padStart(2, "0"); // Ensure two digits
+  const ampm = hours <= 12 ? "AM" : "PM";
+  const formattedHours = hours % 12 || 12;
 
   useEffect(() => {
     const scannerElement = new Html5QrcodeScanner("reader", {
@@ -60,22 +68,39 @@ function Scanner({ onScanResultChange }) {
 
       const data = await response.json();
       console.log("Backend response:", data);
+
+      if (!data.result) {
+        setqrError("Invalid QR");
+      } else {
+        setFullName(data.result.fullname);
+      }
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 10000);
     } catch (error) {
       console.error("Error sending data to backend:", error);
     }
   };
+
   useEffect(() => {
     if (!scanResult) return;
 
     sendScannedDataToBackend(scanResult);
   }, [scanResult]);
+
   return (
     <div id="scanner-cont">
       {scanResult ? (
         <div>
           <br />
           <h2>
-            Success: <a href={scanResult}>{scanResult}</a>
+            Hi! {fullName ? fullName : qrError}
+            <br /> <br />
+            You have successfully logged in. Happy working :)
+            <br />
+            <br />
+            {formattedHours}:{minutes} {ampm}
           </h2>
         </div>
       ) : (

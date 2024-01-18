@@ -3,59 +3,84 @@ import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
 function Buttons() {
-  const [selectedOption, setSelectedOption] = useState("Rechub");
-  const navigate = useNavigate(); // Import useNavigate from react-router-dom
-  const [data, setData] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("");
+  const navigate = useNavigate();
+  const [locations, setLocations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch data using GET method when the component mounts
+    fetch(`http://localhost:4440/logsz/scannerLocations`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setLocations(data.scannerLocations);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        // Handle error
+        setIsLoading(false);
+      });
+  }, []);
+
+  // useEffect(() => {
+  //   // Fetch data using GET method when the component mounts
+  //   fetch(`http://localhost:4440/logsz/scannerLocations`)
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error(`HTTP error! Status: ${response.status}`);
+  //       }
+  //       return response.json();
+  //     })
+  //     .then((data) => {
+  //       console.log("Received data:", data); // Log received data
+  //       setLocations(data.scannerLocations);
+  //       setIsLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching data:", error); // Log error
+  //       setIsLoading(false);
+  //     });
+  // }, []);
+
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
   };
 
   const handleButtonClick = () => {
     // Navigate to qrScanning.jsx when the button is clicked
-    navigate("/qr-scanning?selectedOption=" + selectedOption);
+    navigate(`/qr-scanning?selectedOption=${selectedOption}`);
   };
 
-  const saveUserData = (selectedOption) => {
-    // Replace this with your actual save logic
-    console.log(`Saving user data for ${selectedOption}`);
-    // Add your data-saving logic here
-  };
-
-  // Fetch data using GET method
-  fetch("http://localhost/logsz/scannerLocations")
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      setData(data);
-      setIsLoading(false);
-    })
-    .catch((error) => {
-      // setError(error);
-      setIsLoading(false);
-    });
-
-  useEffect(() => {
-    console.log(data, "fetching?");
-  }, [data]);
   return (
     <div className="button-container">
-      <select
-        value={selectedOption}
-        onChange={handleOptionChange}
-        className="custom-dropdown"
-      >
-        <option value="Rechub">Rechub</option>
-        <option value="OP1">OP1</option>
-        <option value="OP2">OP2</option>
-      </select>
-      <button className="custom-button" onClick={handleButtonClick}>
-        Start Scanning
-      </button>
+      {isLoading ? (
+        <p>Loading locations...</p>
+      ) : (
+        <React.Fragment>
+          <select
+            value={selectedOption}
+            onChange={handleOptionChange}
+            className="custom-dropdown"
+          >
+            {locations.map((location) => (
+              <option
+                key={location.companyLocation_ID}
+                value={location.companyLocation_ID}
+              >
+                {location.location}
+              </option>
+            ))}
+          </select>
+          <button className="custom-button" onClick={handleButtonClick}>
+            Start Scanning
+          </button>
+        </React.Fragment>
+      )}
     </div>
   );
 }
