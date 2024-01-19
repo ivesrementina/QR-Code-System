@@ -62,7 +62,7 @@ function Scanner({ onScanResultChange }) {
         },
         body: JSON.stringify({
           id_num: parseInt(result),
-          scannerLocation_ID: 1,
+          scannerLocation_ID: data,
         }),
       });
 

@@ -18,6 +18,9 @@ function Buttons() {
         return response.json();
       })
       .then((data) => {
+        const scannerData = data.scannerLocations[0];
+        console.log(scannerData);
+        setSelectedOption(scannerData.location);
         setLocations(data.scannerLocations);
         setIsLoading(false);
       })
@@ -62,11 +65,7 @@ function Buttons() {
         <p>Loading locations...</p>
       ) : (
         <React.Fragment>
-          <select
-            value={selectedOption}
-            onChange={handleOptionChange}
-            className="custom-dropdown"
-          >
+          <select onChange={handleOptionChange}>
             {locations.map((location) => (
               <option
                 key={location.companyLocation_ID}
