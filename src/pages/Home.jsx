@@ -4,6 +4,7 @@ import "./Home.css";
 
 function Buttons() {
   const [selectedOption, setSelectedOption] = useState("");
+  const [buttonDisabled, setButtonDisabled] = useState(false);
   const navigate = useNavigate();
   const [locations, setLocations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +21,7 @@ function Buttons() {
       .then((data) => {
         const scannerData = data.scannerLocations[0];
         console.log(scannerData);
-        setSelectedOption(scannerData.location);
+        setSelectedOption(scannerData.scannerLocation_ID);
         setLocations(data.scannerLocations);
         setIsLoading(false);
       })
@@ -30,33 +31,18 @@ function Buttons() {
       });
   }, []);
 
-  // useEffect(() => {
-  //   // Fetch data using GET method when the component mounts
-  //   fetch(`http://localhost:4440/logsz/scannerLocations`)
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error(`HTTP error! Status: ${response.status}`);
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((data) => {
-  //       console.log("Received data:", data); // Log received data
-  //       setLocations(data.scannerLocations);
-  //       setIsLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching data:", error); // Log error
-  //       setIsLoading(false);
-  //     });
-  // }, []);
-
   const handleOptionChange = (event) => {
+    setButtonDisabled(true); // Disable the button when a new location is selected
     setSelectedOption(event.target.value);
+    setTimeout(() => {
+      setButtonDisabled(false); // Enable the button after a delay
+    }, 1500);
+    console.log(event.target.value, "wtf");
   };
 
   const handleButtonClick = () => {
-    // Navigate to qrScanning.jsx when the button is clicked
-    navigate(`/qr-scanning?selectedOption=${selectedOption}`);
+    // Navigate to qr-scanning with selectedOption in the URL
+    navigate(`/qr-scanning/${selectedOption}`);
   };
 
   return (
@@ -68,14 +54,18 @@ function Buttons() {
           <select onChange={handleOptionChange}>
             {locations.map((location) => (
               <option
-                key={location.companyLocation_ID}
-                value={location.companyLocation_ID}
+                key={location.scannerLocation_ID}
+                value={location.scannerLocation_ID}
               >
                 {location.location}
               </option>
             ))}
           </select>
-          <button className="custom-button" onClick={handleButtonClick}>
+          <button
+            className={`custom-button ${buttonDisabled ? "inactive" : ""}`}
+            onClick={handleButtonClick}
+            disabled={buttonDisabled} // Set the disabled state of the button
+          >
             Start Scanning
           </button>
         </React.Fragment>

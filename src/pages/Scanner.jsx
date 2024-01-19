@@ -1,19 +1,31 @@
 // Scanner.js
 import React, { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
+import { useParams } from "react-router-dom";
 import "./Scanner.css";
+import { GridLoader } from "react-spinners";
 
 function Scanner({ onScanResultChange }) {
+  const [loading, setLoading] = useState(false);
   const [scanResult, setScanResult] = useState("");
   const [scanner, setScanner] = useState(null);
   const [fullName, setFullName] = useState("");
   const [qrError, setqrError] = useState("");
+  const { selectedOption } = useParams(); // Get selectedOption from URL parameters
+
   const now = new Date();
 
   const hours = now.getHours();
   const minutes = now.getMinutes().toString().padStart(2, "0"); // Ensure two digits
   const ampm = hours <= 12 ? "AM" : "PM";
   const formattedHours = hours % 12 || 12;
+
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 4500);
+  }, [scanResult]);
 
   useEffect(() => {
     const scannerElement = new Html5QrcodeScanner("reader", {
@@ -62,7 +74,7 @@ function Scanner({ onScanResultChange }) {
         },
         body: JSON.stringify({
           id_num: parseInt(result),
-          scannerLocation_ID: data,
+          scannerLocation_ID: parseInt(selectedOption),
         }),
       });
 
@@ -91,21 +103,29 @@ function Scanner({ onScanResultChange }) {
 
   return (
     <div id="scanner-cont">
-      {scanResult ? (
-        <div>
-          <br />
-          <h2>
-            Hi! {fullName ? fullName : qrError}
-            <br /> <br />
-            You have successfully logged in. Happy working :)
+      {/* {loading ? (
+        <GridLoader color={'#D0021B'} loading={loading} size={100} />
+      ) : ( */}
+      <>
+        {!scanResult ? (
+          <div id="reader"></div>
+        ) : loading ? (
+          <GridLoader color={"#D0021B"} loading={loading} size={100} />
+        ) : (
+          <div>
             <br />
-            <br />
-            {formattedHours}:{minutes} {ampm}
-          </h2>
-        </div>
-      ) : (
-        <div id="reader"></div>
-      )}
+            <h2>
+              Hi! {fullName}
+              <br /> <br />
+              You have successfully logged in. Happy working :)
+              <br />
+              <br />
+              {formattedHours}:{minutes} {ampm}
+            </h2>
+          </div>
+        )}
+      </>
+      {/* )}  */}
     </div>
   );
 }
