@@ -63,8 +63,8 @@ function Scanner({ onScanResultChange }) {
       }
 
       // Update the last scan time
-      sessionStorage.setItem("lastScanTime", new Date().getTime());
-      setLastScanTime(new Date());
+      sessionStorage.setItem("lastScanTime", Date.now());
+      setLastScanTime(Date.now());
 
       // Add the last successful scan result to the URL
       navigate(
@@ -107,6 +107,8 @@ function Scanner({ onScanResultChange }) {
         setFullName(data.result.fullname);
       }
 
+      console.log(data.status);
+
       setTimeout(() => {
         window.location.reload();
       }, 10000);
@@ -122,22 +124,38 @@ function Scanner({ onScanResultChange }) {
     sendScannedDataToBackend(scanResult);
   }, [scanResult]);
 
+  const getCurrentDateTimeInTimeZone = (timezone) => {
+    const date = new Date().toLocaleString("en-US", { timeZone: timezone });
+    return {
+      dateTime: date,
+      date: date.split(", ")[0],
+      time: date.split(", ")[1],
+    };
+  };
+
+  const currentDateTime = getCurrentDateTimeInTimeZone("Asia/Manila");
+
   return (
     <div id="scanner-cont">
       <>
         {!scanResult ? (
           <div id="reader"></div>
         ) : loading ? (
-          <GridLoader color={"#D0021B"} loading={loading} size={100} />
+          <GridLoader color={"#198754"} loading={loading} size={100} />
         ) : (
           <div>
             <h2>
-              Hi! {fullName} <br /> <br />
-              You have successfully logged in. Happy working :)
+              {fullName && (
+                <p>
+                  Hi! {fullName} <br /> <br /> You have successfully logged in.
+                  Happy working :) <br />
+                  <br />{" "}
+                  {`Date: ${currentDateTime.date}, Time: ${currentDateTime.time}`}{" "}
+                </p>
+              )}{" "}
+              {qrError && <h1>INVALID QR</h1>}
               <br />
-              {new Date().toLocaleTimeString()}
             </h2>
-            {qrError && <p className="error-message">{qrError}</p>}
           </div>
         )}
       </>

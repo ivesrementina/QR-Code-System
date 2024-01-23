@@ -20,7 +20,10 @@ function Buttons() {
       })
       .then((data) => {
         const scannerData = data.scannerLocations[0];
-        console.log(scannerData);
+        const scannerDataFull = data.scannerLocations;
+        console.log("scannerDatasdfsdfsdf", scannerData);
+        console.log("scannerDatasdfsdfsdf", scannerDataFull);
+
         setSelectedOption(scannerData.scannerLocation_ID);
         setLocations(data.scannerLocations);
         setIsLoading(false);
@@ -42,6 +45,9 @@ function Buttons() {
 
   const handleButtonClick = () => {
     // Navigate to qr-scanning with selectedOption in the URL
+    // if() {
+
+    // }
     navigate(`/qr-scanning/${selectedOption}`);
   };
 
