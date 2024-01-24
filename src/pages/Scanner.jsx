@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useParams, useNavigate } from "react-router-dom";
+import { DateTime } from "luxon"; // Import DateTime from luxon
 import "./Scanner.css";
 import { GridLoader } from "react-spinners";
 
@@ -10,6 +11,9 @@ function Scanner({ onScanResultChange }) {
   const [scanner, setScanner] = useState(null);
   const [fullName, setFullName] = useState("");
   const [qrError, setqrError] = useState("");
+  const [loginType, setloginType] = useState("");
+  const [happyWorking, setHappyWorking] = useState("");
+
   const { selectedOption } = useParams(); // Get selectedOption from URL parameters
   const [lastScanTime, setLastScanTime] = useState(
     () => Number(sessionStorage.getItem("lastScanTime")) || null
@@ -105,9 +109,11 @@ function Scanner({ onScanResultChange }) {
         setqrError("Invalid QR");
       } else {
         setFullName(data.result.fullname);
+        setloginType(data.result.type);
       }
 
       console.log(data.status);
+      console.log(data.result.type);
 
       setTimeout(() => {
         window.location.reload();
@@ -116,7 +122,18 @@ function Scanner({ onScanResultChange }) {
       console.error("Error sending data to backend:", error);
       setqrError("Error sending data to backend");
     }
+    setTimeout(() => {
+      window.location.reload();
+    }, 10000);
   };
+
+  useEffect(() => {
+    if (loginType === "in") {
+      setHappyWorking("Happy Working :)");
+    } else {
+      setHappyWorking("Thank you for your service :) ");
+    }
+  }, [loginType]);
 
   useEffect(() => {
     if (!scanResult) return;
@@ -124,16 +141,18 @@ function Scanner({ onScanResultChange }) {
     sendScannedDataToBackend(scanResult);
   }, [scanResult]);
 
-  const getCurrentDateTimeInTimeZone = (timezone) => {
-    const date = new Date().toLocaleString("en-US", { timeZone: timezone });
+  const getCurrentDateTimeInTimeZone = () => {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const currentDateTime = DateTime.now().setZone(timezone);
+
     return {
-      dateTime: date,
-      date: date.split(", ")[0],
-      time: date.split(", ")[1],
+      dateTime: currentDateTime.toFormat("MM-dd-yyyy HH:mm:ss"),
+      date: currentDateTime.toFormat("MM-dd-yyyy"),
+      time: currentDateTime.toFormat("HH:mm:ss"),
     };
   };
 
-  const currentDateTime = getCurrentDateTimeInTimeZone("Asia/Manila");
+  const currentDateTime = getCurrentDateTimeInTimeZone();
 
   return (
     <div id="scanner-cont">
@@ -147,8 +166,9 @@ function Scanner({ onScanResultChange }) {
             <h2>
               {fullName && (
                 <p>
-                  Hi! {fullName} <br /> <br /> You have successfully logged in.
-                  Happy working :) <br />
+                  Hi! {fullName} <br /> <br /> You have successfully logged{" "}
+                  {loginType}. <br /> <br />
+                  {happyWorking} <br />
                   <br />{" "}
                   {`Date: ${currentDateTime.date}, Time: ${currentDateTime.time}`}{" "}
                 </p>
