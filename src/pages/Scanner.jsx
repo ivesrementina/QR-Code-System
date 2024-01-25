@@ -54,19 +54,6 @@ function Scanner({ onScanResultChange }) {
       // Notify parent component about the scan result change
       onScanResultChange(result);
 
-      // Check if the same QR is scanned within 2 minutes
-      if (lastScanTime) {
-        const diffMs = Math.abs(Date.now() - lastScanTime);
-        const diffMin = Math.floor(diffMs / 1000 / 60);
-        if (diffMin < MINUTES_BEFORE_SCANNING_ALLOWED) {
-          // More than X minutes have passed
-          setqrError(
-            `Please wait ${MINUTES_BEFORE_SCANNING_ALLOWED} minute(s) before scanning again.`
-          );
-          return;
-        }
-      }
-
       // Update the last scan time
       sessionStorage.setItem("lastScanTime", Date.now());
       setLastScanTime(Date.now());
