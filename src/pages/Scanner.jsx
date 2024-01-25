@@ -92,7 +92,6 @@ function Scanner({ onScanResultChange }) {
 
       const data = await response.json();
       console.log("Backend response:", data);
-
       if (!data.result) {
         setqrError("Invalid QR");
       } else {
@@ -100,6 +99,7 @@ function Scanner({ onScanResultChange }) {
         setloginType(data.result.type);
         setLog(data.result.log);
       }
+      setScanResult("");
 
       console.log(data.status);
       console.log(data.result.type);
@@ -112,9 +112,9 @@ function Scanner({ onScanResultChange }) {
       console.error("Error sending data to backend:", error);
       setqrError("Error sending data to backend");
     }
-    setTimeout(() => {
-      window.location.reload();
-    }, 10000);
+
+    localStorage.setItem("resultID", result);
+    console.log(localStorage.getItem("resultID"));
   };
 
   useEffect(() => {
@@ -126,9 +126,22 @@ function Scanner({ onScanResultChange }) {
   }, [loginType]);
 
   useEffect(() => {
-    if (!scanResult) return;
+    if (!scanResult.length) return;
 
-    sendScannedDataToBackend(scanResult);
+    if (!localStorage.getItem("resultID")) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 10000);
+      return;
+    }
+
+    if (scanResult === localStorage.getItem("resultID")) {
+      return;
+    } else {
+      sendScannedDataToBackend(scanResult);
+
+      localStorage.setItem("resultID", scanResult);
+    }
   }, [scanResult]);
 
   return (
@@ -150,6 +163,9 @@ function Scanner({ onScanResultChange }) {
                 </p>
               )}{" "}
               {qrError && <h1>INVALID QR</h1>}
+              {scanResult === localStorage.getItem("resultID") && (
+                <h1>DUPLICATE ENTRY!</h1>
+              )}
               <br />
             </h2>
           </div>
