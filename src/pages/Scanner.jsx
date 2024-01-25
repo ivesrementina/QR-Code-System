@@ -13,6 +13,7 @@ function Scanner({ onScanResultChange }) {
   const [qrError, setqrError] = useState("");
   const [loginType, setloginType] = useState("");
   const [happyWorking, setHappyWorking] = useState("");
+  const [log, setLog] = useState("");
 
   const { selectedOption } = useParams(); // Get selectedOption from URL parameters
   const [lastScanTime, setLastScanTime] = useState(
@@ -90,6 +91,7 @@ function Scanner({ onScanResultChange }) {
   const sendScannedDataToBackend = async (result) => {
     try {
       console.log(result);
+      console.log(result);
 
       const response = await fetch("http://localhost:4440/logsz/saveQRLog", {
         method: "POST",
@@ -110,10 +112,12 @@ function Scanner({ onScanResultChange }) {
       } else {
         setFullName(data.result.fullname);
         setloginType(data.result.type);
+        setLog(data.result.log);
       }
 
       console.log(data.status);
       console.log(data.result.type);
+      console.log(data.result.log);
 
       setTimeout(() => {
         window.location.reload();
@@ -141,19 +145,6 @@ function Scanner({ onScanResultChange }) {
     sendScannedDataToBackend(scanResult);
   }, [scanResult]);
 
-  const getCurrentDateTimeInTimeZone = () => {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const currentDateTime = DateTime.now().setZone(timezone);
-
-    return {
-      dateTime: currentDateTime.toFormat("MM-dd-yyyy HH:mm:ss"),
-      date: currentDateTime.toFormat("MM-dd-yyyy"),
-      time: currentDateTime.toFormat("HH:mm:ss"),
-    };
-  };
-
-  const currentDateTime = getCurrentDateTimeInTimeZone();
-
   return (
     <div id="scanner-cont">
       <>
@@ -169,8 +160,7 @@ function Scanner({ onScanResultChange }) {
                   Hi! {fullName} <br /> <br /> You have successfully logged{" "}
                   {loginType}. <br /> <br />
                   {happyWorking} <br />
-                  <br />{" "}
-                  {`Date: ${currentDateTime.date}, Time: ${currentDateTime.time}`}{" "}
+                  <br /> {log}
                 </p>
               )}{" "}
               {qrError && <h1>INVALID QR</h1>}
