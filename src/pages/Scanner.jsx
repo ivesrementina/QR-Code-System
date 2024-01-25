@@ -78,7 +78,6 @@ function Scanner({ onScanResultChange }) {
   const sendScannedDataToBackend = async (result) => {
     try {
       console.log(result);
-      console.log(result);
 
       const response = await fetch("http://localhost:4440/logsz/saveQRLog", {
         method: "POST",
