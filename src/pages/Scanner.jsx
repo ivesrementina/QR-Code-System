@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useParams, useNavigate } from "react-router-dom";
-import { DateTime } from "luxon"; // Import DateTime from luxon
+import { DateTime } from "luxon";
 import "./Scanner.css";
 import { GridLoader } from "react-spinners";
 
@@ -10,12 +10,15 @@ function Scanner({ onScanResultChange }) {
   const [scanResult, setScanResult] = useState("");
   const [scanner, setScanner] = useState(null);
   const [fullName, setFullName] = useState("");
-  const [qrError, setqrError] = useState("");
-  const [loginType, setloginType] = useState("");
+  const [qrError, setQRError] = useState("");
+  const [loginType, setLoginType] = useState("");
   const [happyWorking, setHappyWorking] = useState("");
   const [log, setLog] = useState("");
+  const [isDuplicate, setIsDuplicate] = useState(false);
+  const [formattedDate, setFormattedDate] = useState("");
+  const [formattedTime, setFormattedTime] = useState("");
 
-  const { selectedOption } = useParams(); // Get selectedOption from URL parameters
+  const { selectedOption } = useParams();
   const [lastScanTime, setLastScanTime] = useState(
     () => Number(sessionStorage.getItem("lastScanTime")) || null
   );
@@ -40,6 +43,10 @@ function Scanner({ onScanResultChange }) {
     });
 
     setScanner(scannerElement);
+
+    return () => {
+      scannerElement.clear();
+    };
   }, []);
 
   useEffect(() => {
@@ -51,18 +58,20 @@ function Scanner({ onScanResultChange }) {
       scanner.clear();
       setScanResult(result);
 
-      // Notify parent component about the scan result change
       onScanResultChange(result);
 
-      // Update the last scan time
       sessionStorage.setItem("lastScanTime", Date.now());
       setLastScanTime(Date.now());
 
-      // Add the last successful scan result to the URL
       navigate(
         `/qr-scanning?selectedOption=${selectedOption}&lastScanResult=${result}`
       );
-      // Send the scanned QR code data to the backend
+
+      // Ensure that setScanResult is called after navigation
+      setTimeout(() => {
+        setScanResult("");
+      }, 0);
+
       sendScannedDataToBackend(result);
     }
 
@@ -77,8 +86,6 @@ function Scanner({ onScanResultChange }) {
 
   const sendScannedDataToBackend = async (result) => {
     try {
-      console.log(result);
-
       const response = await fetch("http://localhost:4440/logsz/saveQRLog", {
         method: "POST",
         headers: {
@@ -92,25 +99,49 @@ function Scanner({ onScanResultChange }) {
 
       const data = await response.json();
       console.log("Backend response:", data);
+
       if (!data.result) {
-        setqrError("Invalid QR");
+        setQRError("Invalid QR");
       } else {
         setFullName(data.result.fullname);
-        setloginType(data.result.type);
+        setLoginType(data.result.type);
         setLog(data.result.log);
-      }
-      setScanResult("");
+        const logDate = new Date(data.result.log);
 
-      console.log(data.status);
-      console.log(data.result.type);
-      console.log(data.result.log);
+        // Format date
+        const optionsDate = { year: "numeric", month: "long", day: "numeric" };
+        const formattedDateString = logDate.toLocaleDateString(
+          "en-US",
+          optionsDate
+        );
+
+        // Format time
+        const optionsTime = {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        };
+        const formattedTimeString = logDate.toLocaleTimeString(
+          "en-US",
+          optionsTime
+        );
+
+        setFormattedDate(formattedDateString);
+        setFormattedTime(formattedTimeString);
+      }
+
+      // Ensure that setQRError is called after processing data
+      setTimeout(() => {
+        setQRError("");
+      }, 0);
 
       setTimeout(() => {
         window.location.reload();
       }, 10000);
     } catch (error) {
       console.error("Error sending data to backend:", error);
-      setqrError("Error sending data to backend");
+      setQRError("Error sending data to backend");
     }
 
     localStorage.setItem("resultID", result);
@@ -121,28 +152,33 @@ function Scanner({ onScanResultChange }) {
     if (loginType === "in") {
       setHappyWorking("Happy Working :)");
     } else {
-      setHappyWorking("Thank you for your service :) ");
+      setHappyWorking("Thank you for your service :)");
     }
   }, [loginType]);
 
   useEffect(() => {
-    if (!scanResult.length) return;
+    if (scanResult.length > 0) {
+      const storedResult = localStorage.getItem("resultID");
 
-    if (!localStorage.getItem("resultID")) {
-      setTimeout(() => {
-        window.location.reload();
-      }, 10000);
-      return;
-    }
-
-    if (scanResult === localStorage.getItem("resultID")) {
-      return;
-    } else {
-      sendScannedDataToBackend(scanResult);
-
-      localStorage.setItem("resultID", scanResult);
+      if (!storedResult) {
+        localStorage.setItem("resultID", scanResult);
+        setTimeout(() => {
+          window.location.reload();
+        }, 10000);
+      } else if (scanResult !== storedResult) {
+        sendScannedDataToBackend(scanResult);
+      }
+      localStorage.setItem("oldResultID", storedResult);
+      console.log(storedResult, scanResult);
     }
   }, [scanResult]);
+
+  useEffect(() => {
+    const oldScannedValue = localStorage.getItem("oldResultID");
+    const newScannedValue = localStorage.getItem("resultID");
+
+    setIsDuplicate(oldScannedValue === newScannedValue);
+  }, [localStorage.getItem("oldResultID"), localStorage.getItem("resultID")]);
 
   return (
     <div id="scanner-cont">
@@ -159,13 +195,11 @@ function Scanner({ onScanResultChange }) {
                   Hi! {fullName} <br /> <br /> You have successfully logged{" "}
                   {loginType}. <br /> <br />
                   {happyWorking} <br />
-                  <br /> {log}
+                  <br /> {formattedDate} {""} {formattedTime}
                 </p>
-              )}{" "}
-              {qrError && <h1>INVALID QR</h1>}
-              {scanResult === localStorage.getItem("resultID") && (
-                <h1>DUPLICATE ENTRY!</h1>
               )}
+              {qrError && <h1>{qrError}</h1>}
+              {isDuplicate && <h1>DUPLICATE ENTRY!</h1>}
               <br />
             </h2>
           </div>
