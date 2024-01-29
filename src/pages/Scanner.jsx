@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useParams, useNavigate } from "react-router-dom";
-import { DateTime } from "luxon";
+
 import "./Scanner.css";
 import { GridLoader } from "react-spinners";
 
@@ -170,6 +170,9 @@ function Scanner({ onScanResultChange }) {
       }
       localStorage.setItem("oldResultID", storedResult);
       console.log(storedResult, scanResult);
+      setTimeout(() => {
+        window.location.reload();
+      }, 10000);
     }
   }, [scanResult]);
 
