@@ -35,20 +35,18 @@ function Buttons() {
   }, []);
 
   const handleOptionChange = (event) => {
-    setButtonDisabled(true); // Disable the button when a new location is selected
+    setButtonDisabled(true);
     setSelectedOption(event.target.value);
+    localStorage.setItem("selectedOption", event.target.value); // Store selectedOption in localStorage
     setTimeout(() => {
-      setButtonDisabled(false); // Enable the button after a delay
+      setButtonDisabled(false);
     }, 1500);
-    console.log(event.target.value, "wtf");
+    console.log(event.target.value, "yes");
   };
 
   const handleButtonClick = () => {
-    // Navigate to qr-scanning with selectedOption in the URL
-    // if() {
-
-    // }
-    navigate(`/qr-scanning/${selectedOption}`);
+    // Navigate to qr-scanning
+    navigate(`/qr-scanning`);
   };
 
   return (
@@ -70,7 +68,7 @@ function Buttons() {
           <button
             className={`custom-button ${buttonDisabled ? "inactive" : ""}`}
             onClick={handleButtonClick}
-            disabled={buttonDisabled} // Set the disabled state of the button
+            disabled={buttonDisabled}
           >
             Start Scanning
           </button>
