@@ -26,7 +26,7 @@ function App() {
               }
             />
             <Route
-              path="/qr-scanning/:selectedOption"
+              path="/qr-scanning"
               element={
                 <QRScanning onScanResultChange={handleScanResultChange} />
               }

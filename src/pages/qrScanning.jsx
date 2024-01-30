@@ -14,13 +14,17 @@ const QRScanning = () => {
       <h5>Welcome to SupportZebra!</h5>
       <h5>Scan your QR here to record your logs</h5>
       <Scanner />
-      <div class="d-flex justify-content-center gap-5 switch-btn-container">
-        <button type="button" class="btn btn-success switch-btn">
+      <div className="d-flex justify-content-center gap-5 switch-btn-container">
+        <button
+          type="button"
+          className="btn btn-success switch-btn"
+          onClick={handleSwitchLocation}
+        >
           Switch Location
         </button>
         <button
           type="button"
-          class="btn btn-success switch-btn"
+          className="btn btn-success switch-btn"
           id="switch-scanning-device"
         >
           Switch Scanning Device

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
-import { useParams, useNavigate } from "react-router-dom";
-import { DateTime } from "luxon";
+import { useNavigate } from "react-router-dom";
+
 import "./Scanner.css";
 import { GridLoader } from "react-spinners";
 
@@ -18,7 +18,6 @@ function Scanner({ onScanResultChange }) {
   const [formattedDate, setFormattedDate] = useState("");
   const [formattedTime, setFormattedTime] = useState("");
 
-  const { selectedOption } = useParams();
   const [lastScanTime, setLastScanTime] = useState(
     () => Number(sessionStorage.getItem("lastScanTime")) || null
   );
@@ -63,6 +62,8 @@ function Scanner({ onScanResultChange }) {
       sessionStorage.setItem("lastScanTime", Date.now());
       setLastScanTime(Date.now());
 
+      // Get selectedOption from localStorage instead of URL params
+      const selectedOption = localStorage.getItem("selectedOption");
       navigate(
         `/qr-scanning?selectedOption=${selectedOption}&lastScanResult=${result}`
       );
@@ -72,7 +73,7 @@ function Scanner({ onScanResultChange }) {
         setScanResult("");
       }, 0);
 
-      sendScannedDataToBackend(result);
+      sendScannedDataToBackend(result, selectedOption);
     }
 
     function error(err) {
@@ -82,9 +83,9 @@ function Scanner({ onScanResultChange }) {
     return () => {
       scanner.clear();
     };
-  }, [scanner, onScanResultChange, lastScanTime, navigate, selectedOption]);
+  }, [scanner, onScanResultChange, lastScanTime, navigate]);
 
-  const sendScannedDataToBackend = async (result) => {
+  const sendScannedDataToBackend = async (result, selectedOption) => {
     try {
       const response = await fetch("http://localhost:4440/logsz/saveQRLog", {
         method: "POST",
@@ -166,7 +167,9 @@ function Scanner({ onScanResultChange }) {
           window.location.reload();
         }, 10000);
       } else if (scanResult !== storedResult) {
-        sendScannedDataToBackend(scanResult);
+        // Retrieve selectedOption from localStorage
+        const selectedOption = localStorage.getItem("selectedOption");
+        sendScannedDataToBackend(scanResult, selectedOption);
       }
       localStorage.setItem("oldResultID", storedResult);
       console.log(storedResult, scanResult);
