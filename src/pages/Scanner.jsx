@@ -17,15 +17,12 @@ function Scanner({ onScanResultChange }) {
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [formattedDate, setFormattedDate] = useState("");
   const [formattedTime, setFormattedTime] = useState("");
-  const [location, setLocation] = useState("");
 
   const { selectedOption } = useParams();
   const [lastScanTime, setLastScanTime] = useState(
     () => Number(sessionStorage.getItem("lastScanTime")) || null
   );
   const navigate = useNavigate();
-
-  setLocation(localStorage.getItem("selectedLocation"));
 
   const MINUTES_BEFORE_SCANNING_ALLOWED = 2;
 
@@ -66,7 +63,9 @@ function Scanner({ onScanResultChange }) {
       sessionStorage.setItem("lastScanTime", Date.now());
       setLastScanTime(Date.now());
 
-      navigate(`/qr-scanning?/`);
+      navigate(
+        `/qr-scanning?selectedOption=${selectedOption}&lastScanResult=${result}`
+      );
 
       // Ensure that setScanResult is called after navigation
       setTimeout(() => {
@@ -83,7 +82,7 @@ function Scanner({ onScanResultChange }) {
     return () => {
       scanner.clear();
     };
-  }, [scanner, onScanResultChange, lastScanTime, navigate, location]);
+  }, [scanner, onScanResultChange, lastScanTime, navigate, selectedOption]);
 
   const sendScannedDataToBackend = async (result) => {
     try {
@@ -94,7 +93,7 @@ function Scanner({ onScanResultChange }) {
         },
         body: JSON.stringify({
           id_num: parseInt(result),
-          scannerLocation_ID: parseInt(location),
+          scannerLocation_ID: parseInt(selectedOption),
         }),
       });
 
