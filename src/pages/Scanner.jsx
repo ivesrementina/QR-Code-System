@@ -170,6 +170,9 @@ function Scanner({ onScanResultChange }) {
       }
       localStorage.setItem("oldResultID", storedResult);
       console.log(storedResult, scanResult);
+      setTimeout(() => {
+        window.location.reload();
+      }, 10000);
     }
   }, [scanResult]);
 
