@@ -48,7 +48,8 @@ function Buttons() {
     // if() {
 
     // }
-    navigate(`/qr-scanning/${selectedOption}`);
+    navigate(`/qr-scanning/`);
+    localStorage.setItem("selectedLocation", selectedOption);
   };
 
   return (
