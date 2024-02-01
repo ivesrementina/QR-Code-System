@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+body {
+  background: url("./images/Zebra.png");
+}
+
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* 100% of the viewport height */
+}
+
+h1 {
+  text-align: center;
+  margin-top: 100px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  font-family: 'Poppins';
+}
+
+.custom-button {
+  font-family: 'Poppins';
+  margin: 0 10px;
+  padding: 10px 20px;
+  font-size: 23px;
+  background-color: #5cc761;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.custom-container {
+  padding: 20px;
+  margin-top: 80px;
+}
+
+.custom-container h1 {
+  font-family: 'Poppins';
+  font-weight: 600;
+}
+
+.button-location {
+  font-family: 'Poppins';
+}

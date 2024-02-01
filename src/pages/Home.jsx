@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
+import zebraGif from "../images/happy.gif" 
+
 function Buttons() {
   const [selectedOption, setSelectedOption] = useState("");
   const [buttonDisabled, setButtonDisabled] = useState(false);
@@ -50,7 +52,9 @@ function Buttons() {
   };
 
   return (
-    <div className="button-container">
+    <div className="centerGif">
+      <img className="zebraGif" src={zebraGif}></img>
+      <div className="button-container">
       {isLoading ? (
         <p>Loading locations...</p>
       ) : (
@@ -75,6 +79,7 @@ function Buttons() {
         </React.Fragment>
       )}
     </div>
+  </div>
   );
 }
 

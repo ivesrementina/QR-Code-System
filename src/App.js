@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import QRScanning from "./pages/qrScanning";
+import ExternalScanner from "./pages/externalScanner";
 import Home from "./pages/Home"; // Import the Home component
+import "./App.css";
 
 function App() {
   const [resultFromScanner, setResultFromScanner] = useState(null);
@@ -20,7 +22,7 @@ function App() {
               path="/"
               element={
                 <div>
-                  <h1>Welcome, Choose your location</h1>
+                  <h1>Welcome to SZ, Choose your location</h1>
                   <Home />
                 </div>
               }
@@ -29,6 +31,12 @@ function App() {
               path="/qr-scanning"
               element={
                 <QRScanning onScanResultChange={handleScanResultChange} />
+              }
+            />
+             <Route
+              path="/qr-scanning2"
+              element={
+                <ExternalScanner onScanResultChange={handleScanResultChange} />
               }
             />
           </Routes>

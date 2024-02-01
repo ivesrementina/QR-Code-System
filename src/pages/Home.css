@@ -1,8 +1,29 @@
-/* Optional styling for the button container */
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+.centerGif {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
 .button-container {
-  margin-top: 100px;
   height: 50px;
+  margin-top:10px;
 }
 .custom-button.inactive {
-  opacity: 0.5; /* Adjust the opacity level as needed */
+  opacity: 0.5; 
+}
+
+.custom-button {
+  background-color: #5cc761 !important; 
+  color: #ffffff;
+  position: absolute!important;
+  margin-top: 90px!important;
+}
+
+.zebraGif {
+  height: 200px;
+  width: auto;
 }
