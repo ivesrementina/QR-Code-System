@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
 .qrScanning {
   margin: 50px;
-  font-family: 'Poppins';
+  font-family: "Poppins";
   text-align: center;
 }
 
@@ -19,16 +19,16 @@
 .switch-btn {
   height: 40px;
   position: absolute;
-  top: 30px; 
-  right: 25px; 
+  top: 30px;
+  right: 25px;
 }
- 
+
 .switch-btn-container {
   margin: 50px 0px;
 }
- 
-.back-btn { 
+
+.back-btn {
   position: absolute;
-  top: 30px; 
-  left: 25px; 
+  top: 30px;
+  left: 25px;
 }
