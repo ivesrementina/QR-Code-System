@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
-
 import "./Scanner.css";
 import { GridLoader } from "react-spinners";
+import defaultProfile from "../images/user.png";
 
 function Scanner({ onScanResultChange }) {
   const [loading, setLoading] = useState(false);
@@ -17,6 +17,8 @@ function Scanner({ onScanResultChange }) {
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [formattedDate, setFormattedDate] = useState("");
   const [formattedTime, setFormattedTime] = useState("");
+  const [pic, setPic] = useState("");
+  const [link, setLink] = useState("");
 
   const [lastScanTime, setLastScanTime] = useState(
     () => Number(sessionStorage.getItem("lastScanTime")) || null
@@ -107,6 +109,9 @@ function Scanner({ onScanResultChange }) {
         setFullName(data.result.fullname);
         setLoginType(data.result.type);
         setLog(data.result.log);
+        setPic(data.result.pic);
+        console.log("https://app.supportzebra.net/" + data.result.pic);
+
         const logDate = new Date(data.result.log);
 
         // Format date
@@ -148,6 +153,17 @@ function Scanner({ onScanResultChange }) {
     localStorage.setItem("resultID", result);
     console.log(localStorage.getItem("resultID"));
   };
+
+  // over all link to access image
+  // const link = "https://app.supportzebra.net/" + pic;
+
+  useEffect(() => {
+    if (!pic) {
+      setLink(defaultProfile);
+    } else {
+      setLink("https://app.supportzebra.net/" + pic);
+    }
+  }, [pic]);
 
   useEffect(() => {
     if (loginType === "in") {
@@ -195,6 +211,8 @@ function Scanner({ onScanResultChange }) {
           <GridLoader color={"#198754"} loading={loading} size={100} />
         ) : (
           <div>
+            <img className="profile" src={link}></img>
+            <br />
             <h2>
               {fullName && (
                 <p>
