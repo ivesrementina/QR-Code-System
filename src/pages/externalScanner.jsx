@@ -1,47 +1,160 @@
-import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
-import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap styles
-import "./externalScanner.css";
-import instructionsImage from "../images/Instructions.jpg" 
+import React, { useEffect, useState } from "react";
+import useScanDetection from "use-scan-detection-react18";
+import { useNavigate } from "react-router-dom";
+import "./Scanner.css";
+import { GridLoader } from "react-spinners";
+import defaultProfile from "../images/user.png";
 
-const ExternalScanner = () => {
-  const navigate = useNavigate(); // Initialize the useNavigate hook
-  const handleSwitchLocation = () => {
-    navigate("/");
+function ExternalScanner({ onScanResultChange }) {
+  const [loading, setLoading] = useState(false);
+  const [scanResult, setScanResult] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [qrError, setQRError] = useState("");
+  const [loginType, setLoginType] = useState("");
+  const [happyWorking, setHappyWorking] = useState("");
+  const [log, setLog] = useState("");
+  const [isDuplicate, setIsDuplicate] = useState(false);
+  const [formattedDate, setFormattedDate] = useState("");
+  const [formattedTime, setFormattedTime] = useState("");
+  const [pic, setPic] = useState("");
+  const [link, setLink] = useState("");
+
+  const [lastScanTime, setLastScanTime] = useState(
+    () => Number(sessionStorage.getItem("lastScanTime")) || null
+  );
+  const navigate = useNavigate();
+
+  const MINUTES_BEFORE_SCANNING_ALLOWED = 2;
+
+  const { detectScan } = useScanDetection();
+
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 4500);
+  }, [scanResult]);
+
+  useEffect(() => {
+    const handleScanDetected = (result) => {
+      setScanResult(result);
+      onScanResultChange(result);
+
+      sessionStorage.setItem("lastScanTime", Date.now());
+      setLastScanTime(Date.now());
+
+      const selectedOption = localStorage.getItem("selectedOption");
+      navigate(
+        `/qr-scanning?selectedOption=${selectedOption}&lastScanResult=${result}`
+      );
+
+      // Ensure that setScanResult is called after navigation
+      setTimeout(() => {
+        setScanResult("");
+      }, 0);
+
+      sendScannedDataToBackend(result, selectedOption);
+    };
+
+    detectScan(handleScanDetected);
+
+    return () => {
+      // Clean up the scan detection when the component unmounts
+      detectScan(null);
+    };
+  }, [detectScan, onScanResultChange, lastScanTime, navigate]);
+
+  const sendScannedDataToBackend = async (result, selectedOption) => {
+    try {
+      // The rest of the function remains unchanged
+      // ...
+
+      localStorage.setItem("resultID", result);
+      console.log(localStorage.getItem("resultID"));
+    } catch (error) {
+      console.error("Error sending data to backend:", error);
+      setQRError("Error sending data to backend");
+    }
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 10000);
   };
 
-  const handleSwitchDevice = () => {
-    // Navigate to the new page when the button is clicked
-    navigate("/qr-scanning"); // Replace "/new-page" with the desired URL
-  };
+  useEffect(() => {
+    if (!pic) {
+      setLink(defaultProfile);
+    } else {
+      setLink("https://app.supportzebra.net/" + pic);
+    }
+  }, [pic]);
+
+  useEffect(() => {
+    if (loginType === "in") {
+      setHappyWorking("Happy Working :)");
+    } else {
+      setHappyWorking("Thank you for your service :)");
+    }
+  }, [loginType]);
+
+  useEffect(() => {
+    if (scanResult.length > 0) {
+      const storedResult = localStorage.getItem("resultID");
+
+      if (!storedResult) {
+        localStorage.setItem("resultID", scanResult);
+        setTimeout(() => {
+          window.location.reload();
+        }, 10000);
+      } else if (scanResult !== storedResult) {
+        // Retrieve selectedOption from localStorage
+        const selectedOption = localStorage.getItem("selectedOption");
+        sendScannedDataToBackend(scanResult, selectedOption);
+      }
+      localStorage.setItem("oldResultID", storedResult);
+      console.log(storedResult, scanResult);
+      setTimeout(() => {
+        window.location.reload();
+      }, 10000);
+    }
+  }, [scanResult]);
+
+  useEffect(() => {
+    const oldScannedValue = localStorage.getItem("oldResultID");
+    const newScannedValue = localStorage.getItem("resultID");
+
+    setIsDuplicate(oldScannedValue === newScannedValue);
+  }, [localStorage.getItem("oldResultID"), localStorage.getItem("resultID")]);
 
   return (
-    <div className="qrScanning">
-      <div className="Titles">
-      <h5>Welcome to SupportZebra!</h5>
-      <h5>Scan your QR here to record your logs</h5>
-      </div>
-      <div className="centerImage">
-      <img className="instructionsImage" src={instructionsImage}></img>
-      <div className="buttons" class="d-flex justify-content-center gap-1 switch-btn-container">
-        <button
-          type="button"
-          className="btn btn-success back-btn"
-          onClick={handleSwitchLocation}
-        >
-          Back
-        </button>
-        <button
-          type="button"
-          className="btn btn-success switch-btn"
-          id="switch-scanning-device"
-          onClick={handleSwitchDevice}
-        >
-          Switch
-        </button>
-      </div>
-    </div>
+    <div id="scanner-cont">
+      <>
+        {!scanResult ? (
+          <div id="reader"></div>
+        ) : loading ? (
+          <GridLoader color={"#198754"} loading={loading} size={100} />
+        ) : (
+          <div>
+            <img className="profile" src={link} alt="User Profile"></img>
+            <br />
+            <h2>
+              {fullName && (
+                <p>
+                  Hi! {fullName} <br /> <br /> You have successfully logged{" "}
+                  {loginType}. <br /> <br />
+                  {happyWorking} <br />
+                  <br /> {formattedDate} {""} {formattedTime}
+                </p>
+              )}
+              {qrError && <h1>{qrError}</h1>}
+              {isDuplicate && <h1>DUPLICATE ENTRY!</h1>}
+              <br />
+            </h2>
+          </div>
+        )}
+      </>
     </div>
   );
-};
+}
 
 export default ExternalScanner;

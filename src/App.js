@@ -33,10 +33,10 @@ function App() {
                 <QRScanning onScanResultChange={handleScanResultChange} />
               }
             />
-             <Route
+            <Route
               path="/qr-scanning2"
               element={
-                <ExternalScanner onScanResultChange={handleScanResultChange} />
+                <ExternalScanning onScanResultChange={handleScanResultChange} />
               }
             />
           </Routes>
