@@ -7,7 +7,7 @@ import defaultProfile from "../images/user.png";
 
 function ExternalScanner() {
   const [loading, setLoading] = useState(false);
-  const [barcodeScan, setBarcodeScan] = useState("");
+  const [barcodeScan, setBarcodeScan] = useState("No Barcode Scanned");
   const [fullName, setFullName] = useState("");
   const [qrError, setQRError] = useState("");
   const [loginType, setLoginType] = useState("");
