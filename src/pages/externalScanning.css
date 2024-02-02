@@ -1,34 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-.qrScanning {
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+.external {
   margin: 50px;
-  font-family: 'Poppins';
+  font-family: "Poppins";
   text-align: center;
 }
 
-.Titles h1 {
-  margin-top: 90px;
+.external-switch-btn {
+  height: 40px;
+  position: absolute;
+  top: 30px;
+  right: 25px;
+}
+
+.external-back-btn {
+  position: absolute;
+  top: 30px;
+  left: 25px;
+}
+
+.instructionsImage {
+  height: 400px;
+  width: auto;
+}
+
+.externalTitles h1 {
+  margin-top: 140px;
   font-weight: 50;
   font-size: 30px;
 }
 
-.Titles h2 {
+.externalTitles h2 {
   margin-top: 30px;
   font-size: 30px;
-}
-
-.switch-btn {
-  height: 40px;
-  position: absolute;
-  top: 30px; 
-  right: 25px; 
-}
- 
-.switch-btn-container {
-  margin: 50px 0px;
-}
- 
-.back-btn { 
-  position: absolute;
-  top: 30px; 
-  left: 25px; 
 }
