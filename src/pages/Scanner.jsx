@@ -25,8 +25,6 @@ function Scanner({ onScanResultChange }) {
   );
   const navigate = useNavigate();
 
-  const MINUTES_BEFORE_SCANNING_ALLOWED = 2;
-
   useEffect(() => {
     setLoading(true);
     setTimeout(() => {
@@ -190,6 +188,8 @@ function Scanner({ onScanResultChange }) {
       localStorage.setItem("oldResultID", storedResult);
       console.log(storedResult, scanResult);
       setTimeout(() => {
+        localStorage.removeItem(storedResult);
+        localStorage.removeItem(scanResult);
         window.location.reload();
       }, 10000);
     }
