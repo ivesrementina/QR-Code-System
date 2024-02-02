@@ -1,0 +1,36 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+.qrScanning {
+  margin: 50px;
+  font-family: "Poppins";
+  text-align: center;
+}
+
+.qrScanning h5 {
+  font-weight: bold;
+}
+
+.switch-btn {
+  height: 40px;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.switch-btn-container {
+  margin: 50px 0px;
+}
+
+h5 {
+  padding: 7px;
+}
+
+.back-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+}
+
+.instructionsImage {
+  height: 400px;
+  width: auto;
+}

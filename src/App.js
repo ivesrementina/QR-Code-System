@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import QRScanning from "./pages/qrScanning";
-import ExternalScanner from "./pages/externalScanning";
+import ExternalScanning from "./pages/externalScanning";
 import Home from "./pages/Home"; // Import the Home component
 import "./App.css";
 
@@ -36,7 +36,7 @@ function App() {
             <Route
               path="/qr-scanning2"
               element={
-                <ExternalScanner onScanResultChange={handleScanResultChange} />
+                <ExternalScanning onScanResultChange={handleScanResultChange} />
               }
             />
           </Routes>
