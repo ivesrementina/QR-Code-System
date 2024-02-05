@@ -133,12 +133,10 @@ function Scanner({ onScanResultChange }) {
 
         setFormattedDate(formattedDateString);
         setFormattedTime(formattedTimeString);
-      }
 
-      // Ensure that setQRError is called after processing data
-      setTimeout(() => {
-        setQRError("");
-      }, 0);
+        // Ensure that setQRError is called after processing data
+        setQRError(""); // Clear any previous error
+      }
 
       setTimeout(() => {
         window.location.reload();
