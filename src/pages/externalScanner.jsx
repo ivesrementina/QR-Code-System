@@ -122,12 +122,10 @@ function ExternalScanner() {
 
         setFormattedDate(formattedDateString);
         setFormattedTime(formattedTimeString);
-      }
 
-      // Ensure that setQRError is called after processing data
-      setTimeout(() => {
-        setQRError("");
-      }, 0);
+        // Ensure that setQRError is called after processing data
+        setQRError(""); // Clear any previous error
+      }
 
       setTimeout(() => {
         window.location.reload();
@@ -135,6 +133,11 @@ function ExternalScanner() {
     } catch (error) {
       console.error("Error sending data to backend:", error);
       setQRError("Error sending data to backend");
+
+      // Clear the error after 5 seconds (you can adjust the time)
+      setTimeout(() => {
+        setQRError("");
+      }, 0);
     }
 
     localStorage.setItem("resultID", result);
