@@ -6,6 +6,7 @@ import { GridLoader } from "react-spinners";
 import defaultProfile from "../images/user.png";
 
 function ExternalScanner() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
   const [barcodeScan, setBarcodeScan] = useState("");
   const [fullName, setFullName] = useState("");
