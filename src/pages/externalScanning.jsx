@@ -13,7 +13,7 @@ const ExternalScanning = () => {
   };
 
   const handleSwitchDevice = () => {
-    navigate("/qr-scanning2");
+    navigate("/qr-scanning");
   };
 
   return (
