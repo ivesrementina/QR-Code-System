@@ -17,7 +17,7 @@ const QRScanning = () => {
 
   return (
     <div className="qrScanning">
-      <div class="d-flex justify-content-center gap-1 switch-btn-container" >
+      <div className="d-flex justify-content-center gap-1 switch-btn-container">
         <button
           type="button"
           className="btn btn-success back-btn"
@@ -39,7 +39,6 @@ const QRScanning = () => {
         <h2>Scan your QR here to record your logs</h2>
         <Scanner />
       </div>
-      
     </div>
   );
 };

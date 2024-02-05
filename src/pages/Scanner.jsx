@@ -6,6 +6,7 @@ import { GridLoader } from "react-spinners";
 import defaultProfile from "../images/user.png";
 
 function Scanner({ onScanResultChange }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
   const [scanResult, setScanResult] = useState("");
   const [scanner, setScanner] = useState(null);
@@ -76,9 +77,7 @@ function Scanner({ onScanResultChange }) {
       sendScannedDataToBackend(result, selectedOption);
     }
 
-    function error(err) {
-      console.warn(err);
-    }
+    function error(err) {}
 
     return () => {
       scanner.clear();
@@ -86,51 +85,59 @@ function Scanner({ onScanResultChange }) {
   }, [scanner, onScanResultChange, lastScanTime, navigate]);
 
   const sendScannedDataToBackend = async (result, selectedOption) => {
-    try {
-      const response = await fetch("http://localhost:4440/logsz/saveQRLog", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id_num: parseInt(result),
-          scannerLocation_ID: parseInt(selectedOption),
-        }),
-      });
+    if (isSubmitting) {
+      return;
+    } else {
+      try {
+        const response = await fetch("http://localhost:4440/logsz/saveQRLog", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id_num: parseInt(result),
+            scannerLocation_ID: parseInt(selectedOption),
+          }),
+        });
 
-      const data = await response.json();
-      console.log("Backend response:", data);
+        const data = await response.json();
+        console.log("Backend response:", data);
 
-      if (!data.result) {
-        setQRError("Invalid QR");
-      } else {
-        setFullName(data.result.fullname);
-        setLoginType(data.result.type);
-        setLog(data.result.log);
-        setPic(data.result.pic);
-        console.log("https://app.supportzebra.net/" + data.result.pic);
+        if (!data.result) {
+          setQRError("Invalid QR");
+        } else {
+          setFullName(data.result.fullname);
+          setLoginType(data.result.type);
+          setLog(data.result.log);
+          setPic(data.result.pic);
+          console.log("https://app.supportzebra.net/" + data.result.pic);
 
-        const logDate = new Date(data.result.log);
+          const logDate = new Date(data.result.log);
 
-        // Format date
-        const optionsDate = { year: "numeric", month: "long", day: "numeric" };
-        const formattedDateString = logDate.toLocaleDateString(
-          "en-US",
-          optionsDate
-        );
+          // Format date
+          const optionsDate = {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          };
+          const formattedDateString = logDate.toLocaleDateString(
+            "en-US",
+            optionsDate
+          );
 
-        // Format time
-        const optionsTime = {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true,
-        };
-        const formattedTimeString = logDate.toLocaleTimeString(
-          "en-US",
-          optionsTime
-        );
+          // Format time
+          const optionsTime = {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+          };
+          const formattedTimeString = logDate.toLocaleTimeString(
+            "en-US",
+            optionsTime
+          );
 
+<<<<<<< HEAD
         setFormattedDate(formattedDateString);
         setFormattedTime(formattedTimeString);
 
@@ -144,10 +151,27 @@ function Scanner({ onScanResultChange }) {
     } catch (error) {
       console.error("Error sending data to backend:", error);
       setQRError("Error sending data to backend");
-    }
+=======
+          setFormattedDate(formattedDateString);
+          setFormattedTime(formattedTimeString);
 
-    localStorage.setItem("resultID", result);
-    console.log(localStorage.getItem("resultID"));
+          // Ensure that setQRError is called after processing data
+          setQRError(""); // Clear any previous error
+        }
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 10000);
+      } catch (error) {
+        console.error("Error sending data to backend:", error);
+        setQRError("Error sending data to backend");
+      }
+
+      localStorage.setItem("resultID", result);
+      console.log(localStorage.getItem("resultID"));
+>>>>>>> readyForFinal
+    }
+    setIsSubmitting(false);
   };
 
   // over all link to access image
