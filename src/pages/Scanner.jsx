@@ -137,21 +137,6 @@ function Scanner({ onScanResultChange }) {
             optionsTime
           );
 
-<<<<<<< HEAD
-        setFormattedDate(formattedDateString);
-        setFormattedTime(formattedTimeString);
-
-        // Ensure that setQRError is called after processing data
-        setQRError(""); // Clear any previous error
-      }
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 10000);
-    } catch (error) {
-      console.error("Error sending data to backend:", error);
-      setQRError("Error sending data to backend");
-=======
           setFormattedDate(formattedDateString);
           setFormattedTime(formattedTimeString);
 
@@ -169,7 +154,6 @@ function Scanner({ onScanResultChange }) {
 
       localStorage.setItem("resultID", result);
       console.log(localStorage.getItem("resultID"));
->>>>>>> readyForFinal
     }
     setIsSubmitting(false);
   };
