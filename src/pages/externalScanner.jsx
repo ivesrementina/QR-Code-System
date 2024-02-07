@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import useScanDetection from "use-scan-detection-react18";
+
 import { useNavigate } from "react-router-dom";
 import "./Scanner.css";
 import { GridLoader } from "react-spinners";
@@ -27,10 +28,10 @@ function ExternalScanner() {
     }, 4500);
   }, [barcodeScan]);
 
+  //callback function that gets executed when a barcode scan is completed.
   const handleBarcodeComplete = (barcodeData) => {
     setLoading(true);
     setBarcodeScan(barcodeData);
-
     sendScannedDataToBackend(barcodeData);
   };
 
@@ -110,6 +111,7 @@ function ExternalScanner() {
 
     localStorage.setItem("resultID", result);
     console.log(localStorage.getItem("resultID"));
+    console.log(result);
   };
 
   useEffect(() => {
@@ -123,7 +125,6 @@ function ExternalScanner() {
   return (
     <div className="App">
       <>
-        <p>Barcode: {barcodeScan}</p>
         {!barcodeScan ? (
           <div id="reader"></div>
         ) : loading ? (

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+
 import Scanner from "./Scanner";
 import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap styles
@@ -9,6 +10,7 @@ const QRScanning = () => {
   const handleSwitchLocation = () => {
     navigate("/");
   };
+  const [showTitle, setShowTitle] = useState(true);
 
   const handleSwitchDevice = () => {
     // Navigate to the new page when the button is clicked
@@ -35,9 +37,13 @@ const QRScanning = () => {
         </button>
       </div>
       <div className="Titles">
-        <h1>Welcome to SupportZebra!</h1>
-        <h2>Scan your QR here to record your logs</h2>
-        <Scanner />
+        {showTitle && (
+          <>
+            <h1>Welcome to SupportZebra!</h1>
+            <h2>Scan your QR here to record your logs</h2>
+          </>
+        )}
+        <Scanner action={setShowTitle} />
       </div>
     </div>
   );
