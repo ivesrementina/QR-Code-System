@@ -19,7 +19,6 @@ function Scanner({ onScanResultChange, action }) {
   const [formattedTime, setFormattedTime] = useState("");
   const [pic, setPic] = useState("");
   const [link, setLink] = useState("");
-
   const [lastScanTime, setLastScanTime] = useState(
     () => Number(sessionStorage.getItem("lastScanTime")) || null
   );
@@ -75,18 +74,21 @@ function Scanner({ onScanResultChange, action }) {
 
       const localCurrentTime = localStorage.getItem("currentTime");
       const localCurrentEmployee = localStorage.getItem("currentEmployee");
-      const intervalTime = 120000;
-      const isWithinTwoMinutes = false;
+      const intervalTime = 120000; // 2 minutes in milliseconds
 
       if (result === localCurrentEmployee) {
-        ///check if 2 mins na ang nilabay
-        //compare localcurrent and Date.now();
-        //
+        const isWithinTwoMinutes = checkIntervalTime(
+          localCurrentTime,
+          Date.now(),
+          intervalTime
+        );
 
-        if (isWithinTwoMinutes === true) {
+        if (isWithinTwoMinutes) {
           sendScannedDataToBackend(result, selectedOption);
+        } else {
+          setIsDuplicate(true); // Set isDuplicate to true if not within interval
+          return;
         }
-        setIsDuplicate(true);
       } else {
         sendScannedDataToBackend(result, selectedOption);
       }
@@ -127,6 +129,7 @@ function Scanner({ onScanResultChange, action }) {
           action(false);
           setFullName(data.result.fullname);
           setLoginType(data.result.type);
+
           setPic(data.result.pic);
           console.log("https://app.supportzebra.net/" + data.result.pic);
 
@@ -180,6 +183,11 @@ function Scanner({ onScanResultChange, action }) {
     setIsSubmitting(false);
   };
 
+  function checkIntervalTime(lastScanTime, currentTime, intervalTime) {
+    const elapsedTime = currentTime - lastScanTime;
+    return elapsedTime <= intervalTime;
+  }
+
   // over all link to access image
   // const link = "https://app.supportzebra.net/" + pic;
 
@@ -199,6 +207,31 @@ function Scanner({ onScanResultChange, action }) {
     }
   }, [loginType]);
 
+  useEffect(() => {
+    if (scanResult.length > 0) {
+      const storedResult = localStorage.getItem("resultID");
+
+      if (!storedResult) {
+        localStorage.setItem("resultID", scanResult);
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 10000);
+      } else if (scanResult !== storedResult) {
+        // Retrieve selectedOption from localStorage
+        const selectedOption = localStorage.getItem("selectedOption");
+        sendScannedDataToBackend(scanResult, selectedOption);
+      }
+      localStorage.setItem("oldResultID", storedResult);
+      console.log(storedResult, scanResult);
+      setTimeout(() => {
+        localStorage.removeItem(storedResult);
+        localStorage.removeItem(scanResult);
+        window.location.reload();
+      }, 10000);
+    }
+  }, [scanResult]);
+
   return (
     <div id="scanner-cont">
       <>
@@ -208,7 +241,7 @@ function Scanner({ onScanResultChange, action }) {
           <GridLoader color={"#198754"} loading={loading} size={100} />
         ) : (
           <div>
-            <img className="profile" src={link}></img>
+            <img className="profile" src={link} alt="Profile"></img>
             <br />
             <h2>
               {fullName && (
@@ -220,7 +253,9 @@ function Scanner({ onScanResultChange, action }) {
                 </p>
               )}
               {qrError && <h1>{qrError}</h1>}
-              {isDuplicate && <h1>DUPLICATE ENTRY!</h1>}
+              {isDuplicate && (
+                <h1>Duplicate Entry. Please scan after 2 minutes</h1>
+              )}
               <br />
             </h2>
           </div>
