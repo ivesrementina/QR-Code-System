@@ -110,8 +110,8 @@ function Scanner({ onScanResultChange }) {
           setLoginType(data.result.type);
           setLog(data.result.log);
           setPic(data.result.pic);
-          console.log("https://app.supportzebra.net/" + data.result.pic);
-
+          // console.log("https://app.supportzebra.net/" + data.result.pic);
+          console.log(result, "sadasdasdsa");
           const logDate = new Date(data.result.log);
 
           // Format date
