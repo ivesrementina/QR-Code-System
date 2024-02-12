@@ -24,13 +24,6 @@ function Scanner({ onScanResultChange, action }) {
   const navigate = useNavigate();
 
   function success(result) {
-    const localCurrentTime = localStorage.getItem("currentTime");
-    const localCurrentEmployee = localStorage.getItem("currentEmployee");
-    const intervalTime = 120000; // 2 minutes in milliseconds
-    console.log("Local Current Time:", parseInt(localCurrentTime));
-    console.log("Local Current Employee:", localCurrentEmployee);
-    console.log("Current Time:", Date.now());
-
     setScanResult(result);
     onScanResultChange(result);
     localStorage.setItem("lastScanTime", Date.now());
@@ -39,23 +32,10 @@ function Scanner({ onScanResultChange, action }) {
     navigate(
       `/qr-scanning?selectedOption=${selectedOption}&lastScanResult=${result}`
     );
+
     setTimeout(() => {
       setScanResult("");
     }, 0);
-
-    if (result === localCurrentEmployee && localCurrentTime) {
-      const elapsedTime = Date.now() - parseInt(localCurrentTime);
-      console.log("Elapsed Time:", elapsedTime);
-      const isWithinTwoMinutes = checkIntervalTime(
-        parseInt(localCurrentTime),
-        Date.now(),
-        intervalTime
-      );
-      console.log("Is Within Two Minutes:", isWithinTwoMinutes);
-      setIsDuplicate(isWithinTwoMinutes);
-    } else {
-      sendScannedDataToBackend(result, selectedOption);
-    }
   }
 
   function error(err) {
@@ -86,10 +66,11 @@ function Scanner({ onScanResultChange, action }) {
   useEffect(() => {
     if (!scanner) return;
     scanner.render(success, error);
+
     return () => {
       scanner.clear();
     };
-  }, [scanner, onScanResultChange, navigate, isDuplicate]);
+  }, [scanner, onScanResultChange, scanResult]);
 
   const sendScannedDataToBackend = async (result, selectedOption) => {
     try {
@@ -159,11 +140,6 @@ function Scanner({ onScanResultChange, action }) {
     localStorage.setItem("resultID", result);
   };
 
-  function checkIntervalTime(lastScanTime, currentTime, intervalTime) {
-    const elapsedTime = currentTime - lastScanTime;
-    return elapsedTime <= intervalTime;
-  }
-
   useEffect(() => {
     if (!pic) {
       setLink(defaultProfile);
@@ -180,61 +156,72 @@ function Scanner({ onScanResultChange, action }) {
     }
   }, [loginType]);
 
+  function checkIntervalTime(lastScanTime, currentTime, intervalTime) {
+    const elapsedTime = currentTime - lastScanTime;
+    return elapsedTime <= intervalTime;
+  }
+
   useEffect(() => {
     if (scanResult.length > 0) {
       const storedResult = localStorage.getItem("resultID");
 
-      if (!storedResult) {
-        localStorage.setItem("resultID", scanResult);
+      if (scanResult === storedResult) {
+        const localCurrentTime = localStorage.getItem("currentTime");
+        const intervalTime = 120000;
+
+        const elapsedTime = Date.now() - parseInt(localCurrentTime);
+        console.log("Elapsed Time:", elapsedTime);
+        const isWithinTwoMinutes = checkIntervalTime(
+          parseInt(localCurrentTime),
+          Date.now(),
+          intervalTime
+        );
+        console.log("Is Within Two Minutes:", isWithinTwoMinutes);
+        console.log(elapsedTime, "elapsedTime");
+        setIsDuplicate(true);
         setTimeout(() => {
           window.location.reload();
         }, 10000);
+      }
+      if (!storedResult) {
+        localStorage.setItem("resultID", scanResult);
+
+        scanner.clear();
       } else if (scanResult !== storedResult) {
         const selectedOption = localStorage.getItem("selectedOption");
+
         sendScannedDataToBackend(scanResult, selectedOption);
       }
 
       localStorage.setItem("oldResultID", storedResult);
       console.log(storedResult);
       console.log(scanResult);
-
-      setTimeout(() => {
-        localStorage.removeItem(storedResult);
-        localStorage.removeItem(scanResult);
-        window.location.reload();
-      }, 10000);
     }
   }, [scanResult]);
 
   return (
     <div id="scanner-cont">
-      {!scanResult ? (
-        <div id="reader"></div>
-      ) : loading ? (
-        <GridLoader color={"#198754"} loading={loading} size={100} />
-      ) : (
+      <div id="reader"></div>
+      <GridLoader color={"#198754"} loading={loading} size={100} />
+      {fullName && !loading && (
         <div>
           <img className="profile" src={link} alt="Profile" />
           <br />
           <h2>
-            {fullName && (
-              <p>
-                Hi! {fullName} <br /> <br /> You have successfully logged{" "}
-                {loginType}. <br /> <br />
-                {happyWorking} <br />
-                <br /> {formattedDate} {""} {formattedTime}
-              </p>
-            )}
-            {qrError && <h1>{qrError}</h1>}
-            {isDuplicate && (
-              <h1>Duplicate Entry. Please scan after 2 minutes</h1>
-            )}
-            <br />
+            <p>
+              Hi! {fullName} <br /> <br /> You have successfully logged{" "}
+              {loginType}. <br /> <br />
+              {happyWorking} <br />
+              <br /> {formattedDate} {""} {formattedTime}
+            </p>
           </h2>
         </div>
+      )}
+      {qrError && !loading && <h1>{qrError}</h1>}
+      {isDuplicate && !loading && (
+        <h1>Duplicate Entry. Please scan after 2 minutes</h1>
       )}
     </div>
   );
 }
-
 export default Scanner;
