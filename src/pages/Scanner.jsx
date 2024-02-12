@@ -202,8 +202,7 @@ function Scanner({ onScanResultChange, action }) {
   return (
     <div id="scanner-cont">
       <div id="reader"></div>
-      {loading} ? (
-      <GridLoader color={"#198754"} loading={loading} size={100} />) :
+      <GridLoader color={"#198754"} loading={loading} size={100} />
       {fullName && !loading && (
         <div>
           <img className="profile" src={link} alt="Profile" />
