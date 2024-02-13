@@ -55,7 +55,7 @@ function Scanner({ onScanResultChange, action }) {
         width: 300,
         height: 300,
       },
-      fps: 5,
+      fps: 20,
     });
     setScanner(scannerElement);
     return () => {
@@ -136,7 +136,7 @@ function Scanner({ onScanResultChange, action }) {
       console.error("Error sending data to backend:", error);
       setQRError("Error sending data to backend");
     }
-
+    console.log(scanner);
     localStorage.setItem("resultID", result);
   };
 
@@ -202,24 +202,28 @@ function Scanner({ onScanResultChange, action }) {
   return (
     <div id="scanner-cont">
       <div id="reader"></div>
-      <GridLoader color={"#198754"} loading={loading} size={100} />
-      {fullName && !loading && (
+      {scanResult && loading ? (
+        <GridLoader color={"#198754"} loading={loading} size={100} />
+      ) : (
         <div>
-          <img className="profile" src={link} alt="Profile" />
+          <img className="profile" src={link}></img>
           <br />
           <h2>
-            <p>
-              Hi! {fullName} <br /> <br /> You have successfully logged{" "}
-              {loginType}. <br /> <br />
-              {happyWorking} <br />
-              <br /> {formattedDate} {""} {formattedTime}
-            </p>
+            {fullName && (
+              <p>
+                Hi! {fullName} <br /> <br /> You have successfully logged{" "}
+                {loginType}. <br /> <br />
+                {happyWorking} <br />
+                <br /> {formattedDate} {""} {formattedTime}
+              </p>
+            )}
+            {qrError && <h1>{qrError}</h1>}
+            {isDuplicate && (
+              <h1>DUPLICATE ENTRY. You can scan after 2 mins!</h1>
+            )}
+            <br />
           </h2>
         </div>
-      )}
-      {qrError && !loading && <h1>{qrError}</h1>}
-      {isDuplicate && !loading && (
-        <h1>Duplicate Entry. Please scan after 2 minutes</h1>
       )}
     </div>
   );
