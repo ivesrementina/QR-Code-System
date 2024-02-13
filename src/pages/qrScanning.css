@@ -5,13 +5,13 @@
   text-align: center;
 }
 
-.Titles h1 {
+.qrScanning-camera h1 {
   margin-top: 90px;
   font-weight: 50;
   font-size: 30px;
 }
 
-.Titles h2 {
+.qrScanning-camera h2 {
   margin-top: 30px;
   font-size: 30px;
 }
@@ -31,4 +31,13 @@
   position: absolute;
   top: 30px;
   left: 25px;
+}
+
+.qrScanning-camera{
+  display: flex;
+  height: 400px;
+}
+
+.qrScanningHeader{
+  flex: 1;
 }

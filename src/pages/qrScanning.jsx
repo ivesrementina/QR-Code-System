@@ -34,9 +34,11 @@ const QRScanning = () => {
           Switch
         </button>
       </div>
-      <div className="Titles">
-        <h1>Welcome to SupportZebra!</h1>
-        <h2>Scan your QR here to record your logs</h2>
+      <div className="qrScanning-camera">
+        <div className="qrScanningHeader">
+          <h1>Welcome to SupportZebra!</h1>
+          <h2>Scan your QR here to record your logs</h2>
+        </div>
         <Scanner />
       </div>
       

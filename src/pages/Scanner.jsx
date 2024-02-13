@@ -6,6 +6,7 @@ import { GridLoader } from "react-spinners";
 import defaultProfile from "../images/user.png";
 
 function Scanner({ onScanResultChange }) {
+  const [isScan, setIsScan] = useState(true)
   const [loading, setLoading] = useState(false);
   const [scanResult, setScanResult] = useState("");
   const [scanner, setScanner] = useState(null);
@@ -27,14 +28,7 @@ function Scanner({ onScanResultChange }) {
 
   const MINUTES_BEFORE_SCANNING_ALLOWED = 2;
 
-  useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 4500);
-  }, [scanResult]);
-
-  useEffect(() => {
+  const initializeScanner = () => {
     const scannerElement = new Html5QrcodeScanner("reader", {
       qrbox: {
         width: 300,
@@ -42,17 +36,30 @@ function Scanner({ onScanResultChange }) {
       },
       fps: 5,
     });
-
+  
     setScanner(scannerElement);
-
+  
     return () => {
       scannerElement.clear();
     };
+
+  }
+
+  useEffect(() => {
+   initializeScanner();
   }, []);
+ 
+
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 4500);
+  }, [scanResult]);
+
 
   useEffect(() => {
     if (!scanner) return;
-
     scanner.render(success, error);
 
     function success(result) {
@@ -79,7 +86,7 @@ function Scanner({ onScanResultChange }) {
     }
 
     function error(err) {
-      console.warn(err);
+      // console.warn(err);
     }
 
     return () => {
@@ -102,6 +109,7 @@ function Scanner({ onScanResultChange }) {
 
       const data = await response.json();
       console.log("Backend response:", data);
+      setIsScan(true)
 
       if (!data.result) {
         setQRError("Invalid QR");
@@ -143,7 +151,8 @@ function Scanner({ onScanResultChange }) {
       }, 0);
 
       setTimeout(() => {
-        window.location.reload();
+        // window.location.reload();
+        setIsScan(true)
       }, 10000);
     } catch (error) {
       console.error("Error sending data to backend:", error);
@@ -153,6 +162,8 @@ function Scanner({ onScanResultChange }) {
     localStorage.setItem("resultID", result);
     console.log(localStorage.getItem("resultID"));
   };
+
+  // clear instance
 
   // over all link to access image
   // const link = "https://app.supportzebra.net/" + pic;
@@ -169,18 +180,20 @@ function Scanner({ onScanResultChange }) {
     if (loginType === "in") {
       setHappyWorking("Happy Working :)");
     } else {
-      setHappyWorking("Thank you for your service :)");
+      setHappyWorking("Thank you for your service :)"); 
     }
   }, [loginType]);
 
   useEffect(() => {
     if (scanResult.length > 0) {
+      setIsScan(false)
       const storedResult = localStorage.getItem("resultID");
 
       if (!storedResult) {
         localStorage.setItem("resultID", scanResult);
         setTimeout(() => {
-          window.location.reload();
+          // window.location.reload();
+          setIsScan(true)
         }, 10000);
       } else if (scanResult !== storedResult) {
         // Retrieve selectedOption from localStorage
@@ -190,22 +203,25 @@ function Scanner({ onScanResultChange }) {
       localStorage.setItem("oldResultID", storedResult);
       console.log(storedResult, scanResult);
       setTimeout(() => {
-        window.location.reload();
+        // window.location.reload();
+        setIsScan(true)
       }, 10000);
     }
   }, [scanResult]);
 
+  console.log(scanResult)
+
   useEffect(() => {
     const oldScannedValue = localStorage.getItem("oldResultID");
     const newScannedValue = localStorage.getItem("resultID");
-
-    setIsDuplicate(oldScannedValue === newScannedValue);
+console.log(log)
+    setIsDuplicate(oldScannedValue === newScannedValue );
   }, [localStorage.getItem("oldResultID"), localStorage.getItem("resultID")]);
-
+ 
   return (
     <div id="scanner-cont">
       <>
-        {!scanResult ? (
+        {isScan ? (
           <div id="reader"></div>
         ) : loading ? (
           <GridLoader color={"#198754"} loading={loading} size={100} />
@@ -214,16 +230,22 @@ function Scanner({ onScanResultChange }) {
             <img className="profile" src={link}></img>
             <br />
             <h2>
-              {fullName && (
-                <p>
-                  Hi! {fullName} <br /> <br /> You have successfully logged{" "}
-                  {loginType}. <br /> <br />
-                  {happyWorking} <br />
-                  <br /> {formattedDate} {""} {formattedTime}
-                </p>
-              )}
+            {fullName && (
+              <p>
+                  <span style={{ fontWeight: "bold", fontSize: "1.2em" }}>Hi!</span>{" "}
+                  <span style={{ color: "green" }}>{fullName}</span> <br /> <br />
+                  <span style={{ fontSize: "0.7em" }}>You have successfully logged</span>{" "}
+                  <span style={{ color: "green", fontWeight: "bold", textTransform: "uppercase" }}>{loginType}</span>
+                  . <br /> <br /> 
+                  <span style={{ fontSize: "0.7em" }}>{happyWorking}</span> <br />
+                  <br />
+                  <span style={{ fontWeight: "bold", fontSize: "0.8em" }}>{formattedDate}</span>{" "}{""}
+                  <span style={{ fontWeight: "bold", fontSize: "0.8em" }}>{formattedTime}</span>
+              </p>
+            )}
               {qrError && <h1>{qrError}</h1>}
               {isDuplicate && <h1>DUPLICATE ENTRY!</h1>}
+              <br />
               <br />
             </h2>
           </div>
