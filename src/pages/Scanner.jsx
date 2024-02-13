@@ -5,7 +5,7 @@ import "./Scanner.css";
 import { GridLoader } from "react-spinners";
 import defaultProfile from "../images/user.png";
 
-function Scanner({ onScanResultChange, action }) {
+function Scanner({ onScanResultChange }) {
   const [loading, setLoading] = useState(false);
   const [scanResult, setScanResult] = useState("");
   const [scanner, setScanner] = useState(null);
@@ -21,8 +21,10 @@ function Scanner({ onScanResultChange, action }) {
   const [lastScanTime, setLastScanTime] = useState(
     () => Number(localStorage.getItem("lastScanTime")) || null
   );
+
   const navigate = useNavigate();
 
+  // Success function
   function success(result) {
     setScanResult(result);
     onScanResultChange(result);
@@ -33,40 +35,6 @@ function Scanner({ onScanResultChange, action }) {
       `/qr-scanning?selectedOption=${selectedOption}&lastScanResult=${result}`
     );
   }
-
-  function error(err) {
-    // Handle error
-  }
-
-  useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 4500);
-  }, [scanResult]);
-
-  useEffect(() => {
-    const scannerElement = new Html5QrcodeScanner("reader", {
-      qrbox: {
-        width: 300,
-        height: 300,
-      },
-      fps: 20,
-    });
-    setScanner(scannerElement);
-    return () => {
-      scannerElement.clear();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!scanner) return;
-    scanner.render(success, error);
-
-    return () => {
-      scanner.clear();
-    };
-  }, [scanner, onScanResultChange, scanResult]);
 
   const sendScannedDataToBackend = async (result, selectedOption) => {
     try {
@@ -89,9 +57,7 @@ function Scanner({ onScanResultChange, action }) {
         setQRError(
           "Invalid QR code. Please scan only a Support Zebra dedicated QR code."
         );
-        action(false);
       } else {
-        action(false);
         setFullName(data.result.fullname);
         setLoginType(data.result.type);
         setPic(data.result.pic);
@@ -136,6 +102,42 @@ function Scanner({ onScanResultChange, action }) {
 
     localStorage.setItem("resultID", result);
   };
+
+  function error(err) {
+    // Handle error
+  }
+
+  //USE EFFECTS
+
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 4500);
+  }, [scanResult]);
+
+  useEffect(() => {
+    const scannerElement = new Html5QrcodeScanner("reader", {
+      qrbox: {
+        width: 300,
+        height: 300,
+      },
+      fps: 20,
+    });
+    setScanner(scannerElement);
+    return () => {
+      scannerElement.clear();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!scanner) return;
+    scanner.render(success, error);
+
+    return () => {
+      scanner.clear();
+    };
+  }, [scanner, onScanResultChange, scanResult]);
 
   useEffect(() => {
     if (!pic) {
