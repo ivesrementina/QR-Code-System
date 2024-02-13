@@ -46,7 +46,9 @@ function ExternalScanner() {
 
     setIsDuplicate(oldScannedValue === newScannedValue);
   }, [localStorage.getItem("oldResultID"), localStorage.getItem("resultID")]);
-
+  
+  
+  console.log(localStorage.getItem("selectedOption"))
   const sendScannedDataToBackend = async (result) => {
     try {
       const selectedOption = localStorage.getItem("selectedOption");
