@@ -32,10 +32,6 @@ function Scanner({ onScanResultChange, action }) {
     navigate(
       `/qr-scanning?selectedOption=${selectedOption}&lastScanResult=${result}`
     );
-
-    setTimeout(() => {
-      setScanResult("");
-    }, 0);
   }
 
   function error(err) {
@@ -87,6 +83,7 @@ function Scanner({ onScanResultChange, action }) {
 
       const data = await response.json();
       console.log("Backend response:", data);
+      console.log(scanner.getState());
 
       if (!data.result) {
         setQRError(
@@ -136,7 +133,7 @@ function Scanner({ onScanResultChange, action }) {
       console.error("Error sending data to backend:", error);
       setQRError("Error sending data to backend");
     }
-    console.log(scanner);
+
     localStorage.setItem("resultID", result);
   };
 
