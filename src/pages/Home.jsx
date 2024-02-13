@@ -48,6 +48,7 @@ function Buttons() {
 
   const handleButtonClick = () => {
     // Navigate to qr-scanning
+    localStorage.setItem("selectedOption", selectedOption); // Store selectedOption in localStorage
     navigate(`/qr-scanning`);
   };
 

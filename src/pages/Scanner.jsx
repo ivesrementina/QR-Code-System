@@ -5,8 +5,12 @@ import "./Scanner.css";
 import { GridLoader } from "react-spinners";
 import defaultProfile from "../images/user.png";
 
+<<<<<<< HEAD
 function Scanner({ onScanResultChange }) {
   const [isScan, setIsScan] = useState(true)
+=======
+function Scanner({ onScanResultChange, action }) {
+>>>>>>> 8161adfc27b054ac1e8ce937ccb7dad07200ef38
   const [loading, setLoading] = useState(false);
   const [scanResult, setScanResult] = useState("");
   const [scanner, setScanner] = useState(null);
@@ -14,19 +18,54 @@ function Scanner({ onScanResultChange }) {
   const [qrError, setQRError] = useState("");
   const [loginType, setLoginType] = useState("");
   const [happyWorking, setHappyWorking] = useState("");
-  const [log, setLog] = useState("");
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [formattedDate, setFormattedDate] = useState("");
   const [formattedTime, setFormattedTime] = useState("");
   const [pic, setPic] = useState("");
   const [link, setLink] = useState("");
-
   const [lastScanTime, setLastScanTime] = useState(
-    () => Number(sessionStorage.getItem("lastScanTime")) || null
+    () => Number(localStorage.getItem("lastScanTime")) || null
   );
   const navigate = useNavigate();
 
-  const MINUTES_BEFORE_SCANNING_ALLOWED = 2;
+  function success(result) {
+    const localCurrentTime = localStorage.getItem("currentTime");
+    const localCurrentEmployee = localStorage.getItem("currentEmployee");
+    const intervalTime = 120000; // 2 minutes in milliseconds
+    console.log("Local Current Time:", parseInt(localCurrentTime));
+    console.log("Local Current Employee:", localCurrentEmployee);
+    console.log("Current Time:", Date.now());
+
+    setScanResult(result);
+    onScanResultChange(result);
+    localStorage.setItem("lastScanTime", Date.now());
+    setLastScanTime(Date.now());
+    const selectedOption = localStorage.getItem("selectedOption");
+    navigate(
+      `/qr-scanning?selectedOption=${selectedOption}&lastScanResult=${result}`
+    );
+    setTimeout(() => {
+      setScanResult("");
+    }, 0);
+
+    if (result === localCurrentEmployee ) {
+      const elapsedTime = Date.now() - parseInt(localCurrentTime);
+      console.log("Elapsed Time:", elapsedTime);
+      const isWithinTwoMinutes = checkIntervalTime(
+        parseInt(localCurrentTime),
+        Date.now(),
+        intervalTime
+      );
+      console.log("Is Within Two Minutes:", isWithinTwoMinutes);
+      setIsDuplicate(isWithinTwoMinutes);
+    } else {
+      sendScannedDataToBackend(result, selectedOption);
+    }
+  }
+
+  function error(err) {
+    // Handle error
+  }
 
   const initializeScanner = () => {
     const scannerElement = new Html5QrcodeScanner("reader", {
@@ -36,9 +75,13 @@ function Scanner({ onScanResultChange }) {
       },
       fps: 5,
     });
+<<<<<<< HEAD
   
     setScanner(scannerElement);
   
+=======
+    setScanner(scannerElement);
+>>>>>>> 8161adfc27b054ac1e8ce937ccb7dad07200ef38
     return () => {
       scannerElement.clear();
     };
@@ -58,6 +101,7 @@ function Scanner({ onScanResultChange }) {
   }, [scanResult]);
 
 
+<<<<<<< HEAD
   useEffect(() => {
     if (!scanner) return;
     scanner.render(success, error);
@@ -93,6 +137,9 @@ function Scanner({ onScanResultChange }) {
       scanner.clear();
     };
   }, [scanner, onScanResultChange, lastScanTime, navigate]);
+=======
+  
+>>>>>>> 8161adfc27b054ac1e8ce937ccb7dad07200ef38
 
   const sendScannedDataToBackend = async (result, selectedOption) => {
     try {
@@ -108,28 +155,38 @@ function Scanner({ onScanResultChange }) {
       });
 
       const data = await response.json();
+<<<<<<< HEAD
       console.log("Backend response:", data);
       setIsScan(true)
+=======
+      console.log("kaabot dari");
+>>>>>>> 8161adfc27b054ac1e8ce937ccb7dad07200ef38
 
       if (!data.result) {
-        setQRError("Invalid QR");
+        setQRError(
+          "Invalid QR code. Please scan only a Support Zebra dedicated QR code."
+        );
+        action(false);
       } else {
+        action(false);
         setFullName(data.result.fullname);
         setLoginType(data.result.type);
-        setLog(data.result.log);
         setPic(data.result.pic);
-        console.log("https://app.supportzebra.net/" + data.result.pic);
 
         const logDate = new Date(data.result.log);
+        localStorage.setItem("currentTime", data.result.log);
+        localStorage.setItem("currentEmployee", data.result.id_num);
 
-        // Format date
-        const optionsDate = { year: "numeric", month: "long", day: "numeric" };
+        const optionsDate = {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        };
         const formattedDateString = logDate.toLocaleDateString(
           "en-US",
           optionsDate
         );
 
-        // Format time
         const optionsTime = {
           hour: "2-digit",
           minute: "2-digit",
@@ -143,12 +200,8 @@ function Scanner({ onScanResultChange }) {
 
         setFormattedDate(formattedDateString);
         setFormattedTime(formattedTimeString);
+        setQRError(""); // Clear any previous error
       }
-
-      // Ensure that setQRError is called after processing data
-      setTimeout(() => {
-        setQRError("");
-      }, 0);
 
       setTimeout(() => {
         // window.location.reload();
@@ -160,13 +213,27 @@ function Scanner({ onScanResultChange }) {
     }
 
     localStorage.setItem("resultID", result);
-    console.log(localStorage.getItem("resultID"));
   };
 
+<<<<<<< HEAD
   // clear instance
 
   // over all link to access image
   // const link = "https://app.supportzebra.net/" + pic;
+=======
+  useEffect(() => {
+    if (!scanner) return;
+    scanner.render(success, error);
+    return () => {
+      scanner.clear();
+    };
+  }, [scanner, onScanResultChange, navigate, isDuplicate]);
+
+  function checkIntervalTime(lastScanTime, currentTime, intervalTime) {
+    const elapsedTime = currentTime - lastScanTime;
+    return elapsedTime <= intervalTime;
+  }
+>>>>>>> 8161adfc27b054ac1e8ce937ccb7dad07200ef38
 
   useEffect(() => {
     if (!pic) {
@@ -196,19 +263,28 @@ function Scanner({ onScanResultChange }) {
           setIsScan(true)
         }, 10000);
       } else if (scanResult !== storedResult) {
-        // Retrieve selectedOption from localStorage
         const selectedOption = localStorage.getItem("selectedOption");
         sendScannedDataToBackend(scanResult, selectedOption);
       }
+
       localStorage.setItem("oldResultID", storedResult);
-      console.log(storedResult, scanResult);
+      console.log(storedResult);
+      console.log(scanResult);
+
       setTimeout(() => {
+<<<<<<< HEAD
         // window.location.reload();
         setIsScan(true)
+=======
+        localStorage.removeItem(storedResult);
+        localStorage.removeItem(scanResult);
+        window.location.reload();
+>>>>>>> 8161adfc27b054ac1e8ce937ccb7dad07200ef38
       }, 10000);
     }
   }, [scanResult]);
 
+<<<<<<< HEAD
   console.log(scanResult)
 
   useEffect(() => {
@@ -251,6 +327,35 @@ console.log(log)
           </div>
         )}
       </>
+=======
+  return (
+    <div id="scanner-cont">
+      {!scanResult ? (
+        <div id="reader"></div>
+      ) : loading ? (
+        <GridLoader color={"#198754"} loading={loading} size={100} />
+      ) : (
+        <div>
+          <img className="profile" src={link} alt="Profile" />
+          <br />
+          <h2>
+            {fullName && (
+              <p>
+                Hi! {fullName} <br /> <br /> You have successfully logged{" "}
+                {loginType}. <br /> <br />
+                {happyWorking} <br />
+                <br /> {formattedDate} {""} {formattedTime}
+              </p>
+            )}
+            {qrError && <h1>{qrError}</h1>}
+            {isDuplicate && (
+              <h1>Duplicate Entry. Please scan after 2 minutes</h1>
+            )}
+            <br />
+          </h2>
+        </div>
+      )}
+>>>>>>> 8161adfc27b054ac1e8ce937ccb7dad07200ef38
     </div>
   );
 }

@@ -1,18 +1,19 @@
-import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
-import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap styles
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./externalScanning.css";
 import instructionsImage from "../images/Instructions.jpg";
-import ExternalScanner from "./externalScanner";
+import ExternalScanner from "./externalScanner"; // Import ExternalScanner instead of Scanner
 
 const ExternalScanning = () => {
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const navigate = useNavigate();
+
   const handleSwitchLocation = () => {
     navigate("/");
   };
 
   const handleSwitchDevice = () => {
-    // Navigate to the new page when the button is clicked
-    navigate("/qr-scanning"); // Replace "/new-page" with the desired URL
+    navigate("/qr-scanning");
   };
 
   return (
@@ -23,20 +24,21 @@ const ExternalScanning = () => {
         <ExternalScanner />
       </div>
       <div className="centerImage">
-        <img className="instructionsImage" src={instructionsImage}></img>
-        <div
-          className="buttons"
-          class="d-flex justify-content-center gap-1 switch-btn-container"
-        >
+        <img
+          className="instructionsImage"
+          src={instructionsImage}
+          alt="Instructions"
+        ></img>
+        <div className="buttons d-flex justify-content-center gap-1 switch-btn-container">
           <button
-            type="externalButton"
+            type="button"
             className="btn btn-success external-back-btn"
             onClick={handleSwitchLocation}
           >
             Back
           </button>
           <button
-            type="externalButton"
+            type="button"
             className="btn btn-success external-switch-btn"
             id="switch-scanning-device"
             onClick={handleSwitchDevice}
